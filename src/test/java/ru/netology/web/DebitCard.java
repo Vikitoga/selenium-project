@@ -49,15 +49,41 @@ public class DebitCard {
     }
 
     @Test
-    public void shouldNegativeTest() {
+    public void shouldInvalidName() {
         driver.get("http://localhost:9999");
         WebElement form = driver.findElement(By.tagName("form"));
-        form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Noname");
+        // Заполним поле ФИО пустым значением
+        form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys(" ");
         form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79886592356");
         form.findElement(By.className("checkbox__box")).click();
         form.findElement(By.className("button")).click();
-        WebElement invalidField = driver.findElement(By.className("input_invalid"));
-        String errorText = invalidField.findElement(By.className("input__sub")).getText();
-        assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.", errorText.trim());
+        form.findElement(By.cssSelector("[data-test-id=name].input_invalid"));
+
+    }
+
+    @Test
+    public void shouldInvalidPhone() {
+        driver.get("http://localhost:9999");
+        WebElement form = driver.findElement(By.tagName("form"));
+        form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Иванов Иван");
+        // Попробуем вообще не заполнять поле phone
+        // form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79886592356");
+        form.findElement(By.className("checkbox__box")).click();
+        form.findElement(By.className("button")).click();
+        form.findElement(By.cssSelector("[data-test-id=phone].input_invalid"));
+
+    }
+
+    @Test
+    public void shouldInvalidСheckbox() {
+        driver.get("http://localhost:9999");
+        WebElement form = driver.findElement(By.tagName("form"));
+        form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Иванов Иван");
+        form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79886592356");
+        // Не ставим checkbox
+        //form.findElement(By.className("checkbox__box")).click();
+        form.findElement(By.className("button")).click();
+        form.findElement(By.cssSelector("[data-test-id=agreement].input_invalid"));
+
     }
 }
