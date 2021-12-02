@@ -49,7 +49,7 @@ public class DebitCard {
     }
 
     @Test
-    public void shouldInvalidName() {
+    public void shouldWithoutName() {
         driver.get("http://localhost:9999");
         WebElement form = driver.findElement(By.tagName("form"));
         // Заполним поле ФИО пустым значением
@@ -57,7 +57,37 @@ public class DebitCard {
         form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79886592356");
         form.findElement(By.className("checkbox__box")).click();
         form.findElement(By.className("button")).click();
-        form.findElement(By.cssSelector("[data-test-id=name].input_invalid"));
+        String errorText = form.findElement(By.cssSelector("[data-test-id=name].input_invalid .input__sub")).getText();
+        assertEquals("Поле обязательно для заполнения", errorText.trim());
+
+    }
+
+    @Test
+    public void shouldInvalidName() {
+        driver.get("http://localhost:9999");
+        WebElement form = driver.findElement(By.tagName("form"));
+        // Заполним поле ФИО невалидным значением
+        form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Ivan 1+2");
+        form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79886592356");
+        form.findElement(By.className("checkbox__box")).click();
+        form.findElement(By.className("button")).click();
+        String errorText = form.findElement(By.cssSelector("[data-test-id=name].input_invalid .input__sub")).getText();
+        assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.", errorText.trim());
+
+    }
+
+
+    @Test
+    public void shouldWithoutPhone() {
+        driver.get("http://localhost:9999");
+        WebElement form = driver.findElement(By.tagName("form"));
+        form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Иванов Иван");
+        // Попробуем вообще не заполнять поле phone
+        // form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79886592356");
+        form.findElement(By.className("checkbox__box")).click();
+        form.findElement(By.className("button")).click();
+        String errorText = form.findElement(By.cssSelector("[data-test-id=phone].input_invalid .input__sub")).getText();
+        assertEquals("Поле обязательно для заполнения", errorText.trim());
 
     }
 
@@ -66,11 +96,12 @@ public class DebitCard {
         driver.get("http://localhost:9999");
         WebElement form = driver.findElement(By.tagName("form"));
         form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Иванов Иван");
-        // Попробуем вообще не заполнять поле phone
-        // form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79886592356");
+        // Заполняем поле phone невалидными значениями
+        form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+7абракадабра");
         form.findElement(By.className("checkbox__box")).click();
         form.findElement(By.className("button")).click();
-        form.findElement(By.cssSelector("[data-test-id=phone].input_invalid"));
+        String errorText = form.findElement(By.cssSelector("[data-test-id=phone].input_invalid .input__sub")).getText();
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", errorText.trim());
 
     }
 
